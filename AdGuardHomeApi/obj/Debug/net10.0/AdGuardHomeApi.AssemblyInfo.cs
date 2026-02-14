@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdGuardHomeApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+180d7d3c975c477f40bae87b5c91647bfcc532ee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0e7da4bc4851b5cbdb228c47228667a6452cd8e")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdGuardHomeApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdGuardHomeApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
