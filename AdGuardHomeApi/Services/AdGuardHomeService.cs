@@ -14,24 +14,27 @@ public interface IAdGuardHomeService
 public class AdGuardHomeService : IAdGuardHomeService
 {
     private readonly HttpClient _httpClient;
-    private readonly AdGuardHomeSettings _settings;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public AdGuardHomeService(HttpClient httpClient, IOptions<AdGuardHomeSettings> settings)
+    public AdGuardHomeService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _settings = settings.Value;
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
+        string _baseUrl = Environment.GetEnvironmentVariable("ADGUARD_BASE_URL") ?? "";
+        string Username = Environment.GetEnvironmentVariable("ADGUARD_USERNAME") ?? "";
+        string Password = Environment.GetEnvironmentVariable("ADGUARD_PASSWORD") ?? "";
+
+
         // Configure Basic Auth
         var credentials = Convert.ToBase64String(
-            Encoding.ASCII.GetBytes($"{_settings.Username}:{_settings.Password}"));
-        _httpClient.DefaultRequestHeaders.Authorization = 
+            Encoding.ASCII.GetBytes($"{Username}:{Password}"));
+        _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Basic", credentials);
-        _httpClient.BaseAddress = new Uri(_settings.BaseUrl);
+        _httpClient.BaseAddress = new Uri(_baseUrl);
     }
 
     public async Task<List<string>> GetUniqueIpsFromQueryLogAsync()
@@ -50,16 +53,16 @@ public class AdGuardHomeService : IAdGuardHomeService
             {
                 foreach (var entry in queryLog.Data)
                 {
-                    if (entry.Answer != null)
+                    if (entry.answer != null)
                     {
-                        foreach (var answer in entry.Answer)
+                        foreach (var answer in entry.answer)
                         {
                             // Only process A (IPv4) and AAAA (IPv6) records
-                            if ((answer.Type == "A" || answer.Type == "AAAA") && 
-                                !string.IsNullOrEmpty(answer.Value) &&
-                                !IsPrivateIp(answer.Value))
+                            if ((answer.type == "A" || answer.type == "AAAA") &&
+                                !string.IsNullOrEmpty(answer.value) &&
+                                !IsPrivateIp(answer.value))
                             {
-                                uniqueIps.Add(answer.Value);
+                                uniqueIps.Add(answer.value);
                             }
                         }
                     }
@@ -77,7 +80,7 @@ public class AdGuardHomeService : IAdGuardHomeService
     private static bool IsPrivateIp(string ip)
     {
         // Filter out private/local IPs that won't have geo data
-        if (ip.StartsWith("10.") || ip.StartsWith("192.168.") || 
+        if (ip.StartsWith("10.") || ip.StartsWith("192.168.") ||
             ip.StartsWith("172.16.") || ip.StartsWith("172.17.") ||
             ip.StartsWith("172.18.") || ip.StartsWith("172.19.") ||
             ip.StartsWith("172.2") || ip.StartsWith("172.3") ||

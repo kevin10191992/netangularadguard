@@ -1,11 +1,9 @@
 using AdGuardHomeApi.Models;
 using AdGuardHomeApi.Services;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Configure AdGuard Home settings
-builder.Services.Configure<AdGuardHomeSettings>(
-    builder.Configuration.GetSection("AdGuardHome"));
+Env.Load();
 
 // Add services to the container.
 builder.Services.AddOpenApi();

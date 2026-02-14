@@ -1,12 +1,5 @@
 namespace AdGuardHomeApi.Models;
 
-public class AdGuardHomeSettings
-{
-    public string BaseUrl { get; set; } = string.Empty;
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
-
 public class QueryLogResponse
 {
     public List<QueryLogEntry> Data { get; set; } = new();
@@ -15,17 +8,53 @@ public class QueryLogResponse
 
 public class QueryLogEntry
 {
-    public List<DnsAnswer>? Answer { get; set; }
-    public string? Question { get; set; }
-    public string? Client { get; set; }
-    public string? Time { get; set; }
+    public bool answer_dnssec { get; set; }
+    public bool cached { get; set; }
+    public string client { get; set; }
+    public ClientInfo client_info { get; set; }
+    public string client_proto { get; set; }
+    public string elapsedMs { get; set; }
+    public int filterId { get; set; }
+    public Question question { get; set; }
+    public string reason { get; set; }
+    public string rule { get; set; }
+    public List<Rule> rules { get; set; }
+    public string status { get; set; }
+    public string time { get; set; }
+    public string upstream { get; set; }
+    public List<Answer> answer { get; set; }
 }
 
-public class DnsAnswer
+public class Question
 {
-    public string? Type { get; set; }
-    public string? Value { get; set; }
-    public int? Ttl { get; set; }
+    public string @class { get; set; }
+    public string name { get; set; }
+    public string type { get; set; }
+}
+
+public class Rule
+{
+    public int filter_list_id { get; set; }
+    public string text { get; set; }
+}
+
+public class Answer
+{
+    public string type { get; set; }
+    public string value { get; set; }
+    public int ttl { get; set; }
+}
+
+public class ClientInfo
+{
+    public Whois whois { get; set; }
+    public string name { get; set; }
+    public string disallowed_rule { get; set; }
+    public bool disallowed { get; set; }
+}
+
+public class Whois
+{
 }
 
 public class DnsQuery
