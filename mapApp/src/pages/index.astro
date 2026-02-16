@@ -1,9 +1,24 @@
 ---
+// Opción 1: Consumir el servicio backend desde el servidor (SSR)
+// Esta es la mejor práctica en Astro - se ejecuta en el servidor antes de renderizar
+let countries = [];
+
+try {
+  const response = await fetch("http://localhost:5072");
+  if (response.ok) {
+    countries = await response.json();
+  } else {
+    console.error("Error al obtener países:", response.statusText);
+  }
+} catch (error) {
+  console.error("Error al consumir el servicio backend:", error);
+  // Puedes manejar el error aquí, por ejemplo, mostrar un mensaje al usuario
+}
 ---
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mapa Adguard</title>
+  <title>Country Map</title>
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -22,6 +37,9 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
+    // Los datos ya están disponibles desde el servidor
+    const countriesData = JSON.parse(document.getElementById('countries-data')?.textContent || '[]');
+    
     document.addEventListener("DOMContentLoaded", async () => {
       const map = L.map("map").setView([0, 0], 2);
 
@@ -30,11 +48,9 @@
       }).addTo(map);
 
       try {
-        const response = await fetch("http://localhost:5072");
-        const countries = await response.json();
-
-        countries.forEach(async (country) => {
-          const { countryCode } = country;
+        // Usar los datos obtenidos del servidor
+        for (const country of countriesData) {
+          const { countryCode, queryCount } = country;
 
           const res = await fetch(
             `https://restcountries.com/v3.1/alpha/${countryCode}`
@@ -44,19 +60,25 @@
 
           if (data && data.length > 0) {
             const latlng = data[0].latlng;
+            const countryName = data[0].name?.common || countryCode;
 
             if (latlng) {
               L.circle(latlng, {
                 radius: 500000,
                 color: "red",
-              }).addTo(map);
+              }).addTo(map).bindTooltip(`${countryName}<br>Query Count: ${queryCount}`);
             }
           }
-        });
+        }
       } catch (error) {
         console.error("Error:", error);
       }
     });
   </script>
+  
+  <!-- Pasar los datos del servidor al cliente de forma segura -->
+  <script id="countries-data" type="application/json" set:html={JSON.stringify(countries)}></script>
 </body>
 </html>
+
+
